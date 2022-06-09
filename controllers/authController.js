@@ -8,8 +8,13 @@ export async function signUp(req, res) {
 	const { name, email, password, confirmPassword } = req.body;
 
 	try {
+		const userExists = await db.query(`SELECT * FROM users WHERE email=$1`, [
+			email,
+		]);
+		if (userExists.rowCount > 0) return res.sendStatus(409);
+
 		await db.query(
-			`INSERT INTO users(name, email, password VALUES ($1, $2, $3, $4))`,
+			`INSERT INTO users(name, email, password VALUES ($1, $2, $3))`,
 			[name, email, bcrypt.hashSync(password, 10)]
 		);
 
@@ -25,22 +30,22 @@ export async function signIn(req, res) {
 	const { email, password } = req.body;
 
 	try {
-		const user = await db.query(`SELECT * FROM users WHERE email=$1`, [email]);
-		if (user.rowCount === 0) return res.sendStatus(401);
+		const { rows: users } = await db.query(`SELECT * FROM users WHERE email=$1`, [
+			email,
+		]);
+		const [user] = users;
+		if (!user) return res.sendStatus(401);
 
-		if (
-			user.rowCount > 1 &&
-			bcrypt.compareSync(password, user.rows[0].password)
-		) {
+		if (bcrypt.compareSync(password, user.password)) {
 			const token = uuid();
-			await db.query(`INSERT INTO sessions(token, userId) VALUES ($1, $2)`, [
+			await db.query(`INSERT INTO sessions(token, "userId") VALUES ($1, $2)`, [
 				token,
-				user.rows[0].id,
+				user.id,
 			]);
 			return res.send({ token });
 		}
 
-		return res.sendStatus(422);
+		return res.sendStatus(401);
 	} catch (e) {
 		console.log(e);
 		res.sendStatus(500);
