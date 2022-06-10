@@ -3,7 +3,6 @@ import { v4 as uuid } from "uuid";
 
 import db from "../config/db.js";
 
-// signup
 export async function signUp(req, res) {
 	const { name, email, password, confirmPassword } = req.body;
 
@@ -25,7 +24,6 @@ export async function signUp(req, res) {
 	}
 }
 
-// signin
 export async function signIn(req, res) {
 	const { email, password } = req.body;
 

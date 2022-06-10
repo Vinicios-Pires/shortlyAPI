@@ -5,14 +5,11 @@ import db from "../config/db.js";
 export async function createShortUrl(req, res) {
 	const { user } = res.locals;
 	const { url } = req.body;
+
 	const shortUrl = nanoid(8);
 
 	if (!user) {
 		return res.sendStatus(401);
-	}
-
-	if (!url) {
-		return res.sendStatus(422);
 	}
 
 	try {

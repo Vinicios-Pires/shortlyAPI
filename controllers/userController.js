@@ -15,6 +15,11 @@ export async function getUserById(req, res) {
 			`SELECT id, "shortUrl", url, views as "visitCount" FROM "shortsUrls" WHERE "userId" = $1`,
 			[id]
 		);
+
+		if (userUrls.rowCount === 0) {
+			return res.sendStatus(404);
+		}
+
 		const shortenedUrls = userUrls.rows;
 
 		res.send({
