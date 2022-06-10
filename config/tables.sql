@@ -19,7 +19,7 @@ CREATE TABLE "shortsUrls" (
 )
 
 -- --------------------------------------------------
-CREATE TABLE "public.users" (
+CREATE TABLE "users" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL,
 	"email" TEXT NOT NULL UNIQUE,
@@ -29,28 +29,26 @@ CREATE TABLE "public.users" (
   OIDS=FALSE
 );
 
-CREATE TABLE "public.shortsUrls" (
+CREATE TABLE "shortsUrls" (
 	"id" serial NOT NULL,
 	"url" TEXT NOT NULL,
-	"userId" TEXT NOT NULL,
-	"views" integer NOT NULL,
+	"userId" integer NOT NULL,
+	"views" integer NOT NULL DEFAULT 0,
+	"shortUrl" TEXT NOT NULL,
 	CONSTRAINT "shortsUrls_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
 );
 
-CREATE TABLE "public.sections" (
+CREATE TABLE "sessions" (
 	"id" serial NOT NULL,
 	"token" TEXT NOT NULL UNIQUE,
 	"userId" integer NOT NULL,
-	CONSTRAINT "sections_pk" PRIMARY KEY ("id")
+	CONSTRAINT "sessions_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
 );
 
 ALTER TABLE "shortsUrls" ADD CONSTRAINT "shortsUrls_fk0" FOREIGN KEY ("userId") REFERENCES "users"("id");
 
-ALTER TABLE "sections" ADD CONSTRAINT "sections_fk0" FOREIGN KEY ("userId") REFERENCES "users"("id");
-
-
-
+ALTER TABLE "sessions" ADD CONSTRAINT "sessions_fk0" FOREIGN KEY ("userId") REFERENCES "users"("id");
