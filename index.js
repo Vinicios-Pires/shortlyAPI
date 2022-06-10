@@ -6,6 +6,7 @@ import db from "./config/db.js";
 
 import authRouter from "./routes/authRouter.js";
 import urlRouter from "./routes/urlRouter.js";
+import userRouter from "./routes/userRouter.js";
 
 const app = express();
 app.use(cors());
@@ -14,6 +15,7 @@ dotenv.config();
 
 app.use(authRouter);
 app.use(urlRouter);
+app.use(userRouter);
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {

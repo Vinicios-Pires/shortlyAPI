@@ -40,6 +40,10 @@ export async function getUrl(req, res) {
 		if (result.rowCount === 0) {
 			return res.sendStatus(404);
 		}
+
+		await db.query(`UPDATE "shortsUrls" SET views = views + 1 WHERE id = $1`, [
+			id,
+		]);
 		res.send(result.rows);
 	} catch (e) {
 		console.log(e);
@@ -69,6 +73,23 @@ export async function deleteUrl(req, res) {
 			]);
 			return res.sendStatus(204);
 		}
+	} catch (e) {
+		console.log(e);
+		res.sendStatus(500);
+	}
+}
+
+export async function getRanking(req, res) {
+	try {
+		const result = await db.query(`
+		SELECT u.id, u.name, COUNT(s."shortUrl") as "linksCount", SUM(s.views) as "visitCount"  
+		FROM users u
+		JOIN "shortsUrls" s ON s."userId" = u.id
+		GROUP BY u.id
+		ORDER BY "visitCount" DESC
+		LIMIT 10`);
+
+		res.status(200).send(result.rows);
 	} catch (e) {
 		console.log(e);
 		res.sendStatus(500);
