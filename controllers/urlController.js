@@ -40,7 +40,37 @@ export async function getUrl(req, res) {
 		if (result.rowCount === 0) {
 			return res.sendStatus(404);
 		}
-
 		res.send(result.rows);
-	} catch (e) {}
+	} catch (e) {
+		console.log(e);
+		res.sendStatus(500);
+	}
+}
+
+export async function deleteUrl(req, res) {
+	const { user } = res.locals;
+	const { id } = req.params;
+
+	if (!user) {
+		return res.sendStatus(401);
+	}
+
+	try {
+		const result = await db.query(
+			`SELECT * FROM "shortsUrls" WHERE id = $1 AND "userId" = $2`,
+			[id, user.id]
+		);
+		if (result.rowCount === 0) {
+			res.sendStatus(404);
+		} else {
+			await db.query(`DELETE FROM "shortsUrls" WHERE id = $1 AND "userId" = $2`, [
+				id,
+				user.id,
+			]);
+			return res.sendStatus(204);
+		}
+	} catch (e) {
+		console.log(e);
+		res.sendStatus(500);
+	}
 }
